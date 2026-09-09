@@ -10,10 +10,10 @@ ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 
 FROM ${BUILDER_IMAGE} AS builder
 
+# No Node.js: Phoenix assets use Mix-managed esbuild + tailwind, and
+# Capacitor is only for the Android app (built outside this image).
 RUN apt-get update -y \
   && apt-get install -y --no-install-recommends build-essential git curl ca-certificates \
-  && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
-  && apt-get install -y --no-install-recommends nodejs \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -28,13 +28,14 @@ COPY local local
 RUN mix deps.get --only prod \
   && mix deps.compile
 
+# Install asset tooling in its own layer so rebuilds reuse the ~100MB+ binaries.
+RUN mix assets.setup
+
 COPY assets assets
 COPY priv priv
 COPY lib lib
-COPY package.json package-lock.json ./
 
-RUN npm ci --omit=dev \
-  && mix compile \
+RUN mix compile \
   && mix assets.deploy \
   && mix release
 

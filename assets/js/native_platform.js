@@ -1,10 +1,10 @@
-import {Capacitor} from "@capacitor/core";
-
 const SYNC_BASE_URL_KEY = "syncBaseUrl";
 
+// Prefer the Capacitor global injected by the native WebView so the
+// production Docker image does not need Node/npm just to bundle assets.
 export function isNativePlatform() {
   try {
-    return Capacitor.isNativePlatform();
+    return Boolean(globalThis.Capacitor?.isNativePlatform?.());
   } catch (_) {
     return false;
   }

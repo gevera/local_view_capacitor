@@ -1,10 +1,22 @@
 import {test} from "node:test";
 import assert from "node:assert/strict";
 import {
+  isNativePlatform,
   mobileReportsUrl,
   normalizeSyncBaseUrl,
   reportsSocketUrl
 } from "../../assets/js/native_platform.js";
+
+test("isNativePlatform uses the Capacitor global when present", () => {
+  const previous = globalThis.Capacitor;
+  globalThis.Capacitor = {isNativePlatform: () => true};
+  assert.equal(isNativePlatform(), true);
+  globalThis.Capacitor = {isNativePlatform: () => false};
+  assert.equal(isNativePlatform(), false);
+  delete globalThis.Capacitor;
+  assert.equal(isNativePlatform(), false);
+  globalThis.Capacitor = previous;
+});
 
 test("normalizeSyncBaseUrl trims trailing slashes and rejects bad schemes", () => {
   assert.equal(normalizeSyncBaseUrl(" https://reports.example.com/ "), "https://reports.example.com");
