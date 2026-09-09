@@ -35,7 +35,8 @@ The timestamp defaults to the current time and is editable in **UTC**. Status is
 - Incoming events are persisted in IndexedDB and merged by report version. Duplicate/older messages and stale HTTP snapshots cannot roll back newer data; unsynced edits and open forms are preserved.
 - Channel join/rejoin triggers catch-up for updates missed while disconnected. Outbox sync also retries on reconnect, every 15 seconds while the app is open, or with **Sync now**. A Web Lock permits only one sync sender per browser origin across tabs, with requests coalesced rather than dropped during an active sync.
 - Mutation UUIDs make retries safe. Report versions detect conflicting edits, including edits made while an old form remains open. Choose **Keep my version** or **Use server version** to resolve a conflict. Deletions retain tombstones so stale clients cannot silently restore deleted reports.
-- A service worker caches the shell and every built runtime asset. API responses are never cached. Sync requests use a fresh CSRF token rather than relying on the token in cached HTML.
+- A Capacitor Android client packages the offline shell. Android WebView cannot enable `SharedArrayBuffer`, so the APK uses an HTML fallback UI with the same IndexedDB store and `/api/mobile/v1` sync. Set your Coolify base URL in **Sync server** inside the app.
+
 
 This is a shared demo without accounts: browsers accessing the same server see the same reports. Browser storage is per origin/device; clearing site data removes local reports and unsynced changes. Offline startup requires a completed initial online visit, a browser with WebAssembly, IndexedDB, Web Locks, and service workers, and HTTPS or localhost. Sync resumes when the app is open, not as a background process after closing the browser.
 
@@ -84,7 +85,9 @@ Coolify notes:
 
 ## Android app (Capacitor)
 
-The LocalLiveView offline shell is packaged as a Capacitor Android app. Reports stay on-device in IndexedDB; when online, the app syncs to `{your Coolify URL}/api/mobile/v1/reports`.
+The offline shell is packaged as a Capacitor Android app. Reports stay on-device in IndexedDB; when online, the app syncs to `{your Coolify URL}/api/mobile/v1/reports`.
+
+**Important:** Android WebView cannot enable `SharedArrayBuffer`, which LocalLiveView’s AtomVM runtime requires. The APK therefore uses an HTML fallback UI with the **same** offline store and sync behavior. Desktop/browser users still get LocalLiveView via the Phoenix app.
 
 Build a debug APK (JDK 17 or 21 recommended; set `JAVA_HOME` if your default JDK is newer):
 

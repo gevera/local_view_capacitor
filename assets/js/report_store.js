@@ -220,8 +220,10 @@ export class ReportStore {
   }
 }
 
-export async function startReportStore(engine) {
-  const notify = (event, payload) => engine.pushEvent("reports-local", event, payload);
+export async function startReportStore(engine, options = {}) {
+  const notify =
+    options.notify ||
+    ((event, payload) => engine.pushEvent("reports-local", event, payload));
   let store;
   try {
     store = new ReportStore(await openDatabase(), {notify});
