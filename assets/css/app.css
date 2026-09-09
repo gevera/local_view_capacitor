@@ -1,0 +1,12 @@
+@import "tailwindcss" source(none);
+@import "phoenix-colocated/local_first/colocated.css";
+@source "../css";
+@source "../js";
+@source "../../lib/local_first_web";
+@source "../../local/lib";
+@source "../../_build/dev/phoenix-colocated/local_first/*/";
+@plugin "../vendor/heroicons";
+@plugin "daisyui/packages/bundle/daisyui" {
+  themes: light --default, dark --prefersdark;
+}
+[data-phx-session], [data-phx-teleported-src] { display: contents }

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Local View</string>
+    <string name="title_activity_main">Local View</string>
+    <string name="package_name">com.gevera.localview</string>
+    <string name="custom_url_scheme">com.gevera.localview</string>
+</resources>

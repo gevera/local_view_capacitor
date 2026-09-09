@@ -1,0 +1,25 @@
+services:
+  web:
+    build: .
+    image: local_view_capacitor:latest
+    ports:
+      - "${PORT:-4000}:4000"
+    environment:
+      PHX_SERVER: "true"
+      PORT: "4000"
+      PHX_HOST: "${PHX_HOST:-your-app.example.com}"
+      SECRET_KEY_BASE: "${SECRET_KEY_BASE:?Set SECRET_KEY_BASE}"
+      DATABASE_PATH: /data/local_first.db
+      POOL_SIZE: "${POOL_SIZE:-5}"
+    volumes:
+      - sqlite_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:4000/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    restart: unless-stopped
+
+volumes:
+  sqlite_data:
