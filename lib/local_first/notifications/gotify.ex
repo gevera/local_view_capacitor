@@ -9,6 +9,25 @@ defmodule LocalFirst.Notifications.Gotify do
   require Logger
 
   @doc """
+  Logs whether Gotify is configured. Call once at application boot for Coolify diagnostics.
+  """
+  def log_boot_status do
+    case config() do
+      %{url: url, token: token}
+      when is_binary(url) and url != "" and is_binary(token) and token != "" ->
+        host = uri_host(url)
+        Logger.info("Gotify notifications enabled (host=#{inspect(host)})")
+
+      _ ->
+        Logger.info(
+          "Gotify notifications disabled (set GOTIFY_URL and GOTIFY_APP_TOKEN to enable)"
+        )
+    end
+
+    :ok
+  end
+
+  @doc """
   Notifies subscribed Gotify clients that a report was deleted.
   Returns `:ok` even when disabled or when Gotify returns an error (logged).
   """
@@ -16,6 +35,8 @@ defmodule LocalFirst.Notifications.Gotify do
     case config() do
       %{url: url, token: token}
       when is_binary(url) and url != "" and is_binary(token) and token != "" ->
+        Logger.info("Gotify: sending report-deleted notification")
+
         send_message(url, token, %{
           title: "Report deleted",
           message: message_body(report),
@@ -23,7 +44,33 @@ defmodule LocalFirst.Notifications.Gotify do
         })
 
       _ ->
+        maybe_log_unconfigured()
         :ok
+    end
+  end
+
+  defp maybe_log_unconfigured do
+    conf = Application.get_env(:local_first, __MODULE__, [])
+    url = Keyword.get(conf, :url)
+    token = Keyword.get(conf, :token)
+    url_set? = is_binary(url) and url != ""
+    token_set? = is_binary(token) and token != ""
+
+    cond do
+      url_set? != token_set? ->
+        Logger.warning(
+          "Gotify: skipped report-deleted notification (set both GOTIFY_URL and GOTIFY_APP_TOKEN)"
+        )
+
+      true ->
+        Logger.debug("Gotify: skipped report-deleted notification (not configured)")
+    end
+  end
+
+  defp uri_host(url) do
+    case URI.parse(url) do
+      %URI{host: host} when is_binary(host) and host != "" -> host
+      _ -> url
     end
   end
 

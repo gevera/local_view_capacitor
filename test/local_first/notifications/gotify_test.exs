@@ -55,6 +55,10 @@ defmodule LocalFirst.Notifications.GotifyTest do
     refute_received {:gotify_payload, _}
   end
 
+  test "log_boot_status reports enabled when configured" do
+    assert :ok = Gotify.log_boot_status()
+  end
+
   test "swallows Gotify HTTP errors" do
     Req.Test.stub(Gotify, fn conn ->
       conn

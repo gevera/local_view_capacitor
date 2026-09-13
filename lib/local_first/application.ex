@@ -7,6 +7,8 @@ defmodule LocalFirst.Application do
 
   @impl true
   def start(_type, _args) do
+    LocalFirst.Notifications.Gotify.log_boot_status()
+
     children = [
       LocalFirstWeb.Telemetry,
       LocalFirst.Repo,
