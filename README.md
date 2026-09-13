@@ -66,6 +66,11 @@ Required environment variables:
 | `DATABASE_PATH` | `/data/local_first.db` (default in the image) |
 | `PHX_SERVER` | `true` |
 | `PORT` | `4000` |
+| `GOTIFY_URL` | `https://gotify.example.com` (optional; omit to disable) |
+| `GOTIFY_APP_TOKEN` | application token from Gotify (required with `GOTIFY_URL`) |
+| `GOTIFY_PRIORITY` | `5` (optional Gotify priority, default `5`) |
+
+When `GOTIFY_URL` and `GOTIFY_APP_TOKEN` are set, soft-deleting a report POSTs a message to Gotify so phones with the Gotify app subscribed to that application receive a native notification. Create an **Application** in Gotify, copy its token into Coolify, and leave the vars unset in environments where you do not want push.
 
 Local compose (set a secret first):
 

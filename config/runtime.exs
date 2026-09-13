@@ -23,6 +23,17 @@ end
 config :local_first, LocalFirstWeb.Endpoint,
   http: [port: String.to_integer(System.get_env("PORT", "4000"))]
 
+# Optional Gotify push for report deletions (Gotify Android app receives these).
+gotify_url = System.get_env("GOTIFY_URL")
+gotify_token = System.get_env("GOTIFY_APP_TOKEN")
+
+if gotify_url && gotify_token do
+  config :local_first, LocalFirst.Notifications.Gotify,
+    url: gotify_url,
+    token: gotify_token,
+    priority: String.to_integer(System.get_env("GOTIFY_PRIORITY") || "5")
+end
+
 # Isolate browser-test data and disable reloaders while testing cached assets.
 if System.get_env("REPORTS_E2E") == "1" do
   config :local_first, LocalFirst.Repo, database: Path.expand("../local_first_e2e.db", __DIR__)

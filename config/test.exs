@@ -30,3 +30,7 @@ config :phoenix_live_view,
 # Sort query params output of verified routes for robust url comparisons
 config :phoenix,
   sort_verified_routes_query_params: true
+
+# Gotify stays disabled in the default test suite (no network). Suites that assert
+# on push set url/token/req_options themselves and use Req.Test stubs.
+config :local_first, LocalFirst.Notifications.Gotify, async: false
